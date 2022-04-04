@@ -35,7 +35,7 @@ services:
       CONSUL_HTTP_ADDR: 10.5.0.2:8500
       CONSUL_GRPC_ADDR: 10.5.0.2:8502
       SERVICE_CONFIG: /config/web_v1.hcl
-      #CENTRAL_CONFIG: "/central_config/web-defaults.hcl;/central_config/api-defaults.hcl;/central_config/api-resolver.hcl"
+      CENTRAL_CONFIG: "/central_config/web-defaults.hcl;/central_config/payments-defaults.hcl;/central_config/payments-resolver.hcl"
     volumes:
       - "./service_config:/config"
       - "./central_config:/central_config"
@@ -49,7 +49,7 @@ services:
     environment:
       LISTEN_ADDR: localhost:9090
       NAME: currency-dc1
-      MESSAGE: "2 USD for 1 GBP"
+      MESSAGE: "Currency on DC1"
       SERVER_TYPE: "http"
     networks:
       dc1:
@@ -103,13 +103,15 @@ services:
   payments_v2:
     image: nicholasjackson/fake-service:v0.7.3
     environment:
-      UPSTREAM_URIS: http://localhost:9091
-      LISTEN_ADDR: localhost:9090
+      #UPSTREAM_URIS: http://localhost:9091
+      LISTEN_ADDR: 0.0.0.0:9090
       NAME: payments-dc2
-      MESSAGE: "PAYMENTS V2"
+      MESSAGE: "PAYMENTS V2 exposed"
     networks:
       dc2:
         ipv4_address: 10.6.0.3
+    ports:
+      - 8080:9090
   payments_proxy_v2:
     image: nicholasjackson/consul-envoy:v1.6.1-v0.10.0
     environment:
